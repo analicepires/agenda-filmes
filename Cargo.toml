@@ -1,0 +1,23 @@
+[package]
+name = "agenda-filmes"
+version = "1.0.0"
+edition = "2021"
+description = "Organizador diário de filmes: catálogo e agenda de sessões (Rust + Axum + SQLite)"
+license = "MIT"
+
+[dependencies]
+axum = "0.8"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal"] }
+rusqlite = { version = "0.37", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tower-http = { version = "0.6", features = ["fs", "cors"] }
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"
+
+[profile.release]
+strip = true
+lto = true

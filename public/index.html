@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de Filmes</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+    <header class="topo">
+        <h1 data-testid="titulo-app">🎬 Agenda de Filmes</h1>
+        <p class="subtitulo">Organize o que você vai assistir em cada dia</p>
+        <nav class="abas" role="tablist">
+            <button id="aba-agenda" class="aba ativa" role="tab" aria-selected="true" data-testid="aba-agenda">Agenda do dia</button>
+            <button id="aba-catalogo" class="aba" role="tab" aria-selected="false" data-testid="aba-catalogo">Catálogo</button>
+        </nav>
+    </header>
+
+    <!-- Mensagem de retorno (sucesso ou erro da API). Fica visível até a próxima ação. -->
+    <div id="mensagem" class="mensagem oculto" role="status" aria-live="polite" data-testid="mensagem"></div>
+
+    <!-- ================= AGENDA ================= -->
+    <main id="secao-agenda" data-testid="secao-agenda">
+        <section class="navegador-dia">
+            <button id="dia-anterior" class="btn-icone" title="Dia anterior" aria-label="Dia anterior" data-testid="dia-anterior">◀</button>
+            <div class="dia-central">
+                <input type="date" id="data-agenda" aria-label="Data da agenda" data-testid="data-agenda">
+                <span id="data-extenso" class="data-extenso" data-testid="data-extenso"></span>
+                <span id="selo-dia" class="selo oculto" data-testid="selo-dia"></span>
+            </div>
+            <button id="dia-seguinte" class="btn-icone" title="Próximo dia" aria-label="Próximo dia" data-testid="dia-seguinte">▶</button>
+            <button id="ir-hoje" class="btn-secundario" data-testid="ir-hoje">Hoje</button>
+        </section>
+
+        <section class="cartao resumo" aria-label="Resumo do dia" data-testid="resumo">
+            <div class="resumo-minutos">
+                <strong id="resumo-minutos" data-testid="resumo-minutos">0 / 480 min</strong>
+                <span id="resumo-livres" class="texto-suave" data-testid="resumo-livres">480 min livres</span>
+            </div>
+            <div class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="480" aria-valuenow="0" id="resumo-barra" data-testid="resumo-barra">
+                <div class="barra-preenchida" id="resumo-barra-preenchida"></div>
+            </div>
+            <ul class="resumo-contagens">
+                <li>Planejadas: <strong id="resumo-planejadas" data-testid="resumo-planejadas">0</strong></li>
+                <li>Assistidas: <strong id="resumo-assistidas" data-testid="resumo-assistidas">0</strong></li>
+                <li>Canceladas: <strong id="resumo-canceladas" data-testid="resumo-canceladas">0</strong></li>
+                <li>Nota média: <strong id="resumo-nota-media" data-testid="resumo-nota-media">—</strong></li>
+            </ul>
+        </section>
+
+        <section class="cartao">
+            <h2>Agendar sessão</h2>
+            <form id="form-sessao" class="form-linha" novalidate data-testid="form-sessao">
+                <label class="campo campo-largo">
+                    <span>Filme</span>
+                    <select id="sessao-filme" name="filme_id" data-testid="sessao-filme"></select>
+                    <small class="erro-campo" data-testid="erro-sessao-filme_id"></small>
+                </label>
+                <label class="campo">
+                    <span>Início</span>
+                    <input type="time" id="sessao-inicio" name="inicio" data-testid="sessao-inicio">
+                    <small class="erro-campo" data-testid="erro-sessao-inicio"></small>
+                </label>
+                <button type="submit" class="btn-primario" data-testid="btn-agendar">Agendar</button>
+            </form>
+        </section>
+
+        <section class="cartao">
+            <h2>Sessões do dia <span id="total-sessoes" class="contador" data-testid="total-sessoes">0</span></h2>
+            <p id="agenda-vazia" class="vazio" data-testid="agenda-vazia">Nenhuma sessão neste dia.</p>
+            <ul id="lista-sessoes" class="lista-sessoes" data-testid="lista-sessoes"></ul>
+        </section>
+    </main>
+
+    <!-- ================= CATÁLOGO ================= -->
+    <main id="secao-catalogo" class="oculto" data-testid="secao-catalogo">
+        <section class="cartao">
+            <h2 id="form-filme-titulo" data-testid="form-filme-titulo">Novo filme</h2>
+            <form id="form-filme" class="form-grade" novalidate data-testid="form-filme">
+                <label class="campo campo-largo">
+                    <span>Título *</span>
+                    <input type="text" id="filme-titulo" name="titulo" data-testid="filme-titulo">
+                    <small class="erro-campo" data-testid="erro-filme-titulo"></small>
+                </label>
+                <label class="campo">
+                    <span>Ano *</span>
+                    <input type="number" id="filme-ano" name="ano" data-testid="filme-ano">
+                    <small class="erro-campo" data-testid="erro-filme-ano"></small>
+                </label>
+                <label class="campo">
+                    <span>Gênero *</span>
+                    <select id="filme-genero" name="genero" data-testid="filme-genero"></select>
+                    <small class="erro-campo" data-testid="erro-filme-genero"></small>
+                </label>
+                <label class="campo">
+                    <span>Duração (min) *</span>
+                    <input type="number" id="filme-duracao" name="duracao_min" data-testid="filme-duracao">
+                    <small class="erro-campo" data-testid="erro-filme-duracao_min"></small>
+                </label>
+                <label class="campo campo-inteiro">
+                    <span>Sinopse</span>
+                    <textarea id="filme-sinopse" name="sinopse" rows="2" data-testid="filme-sinopse"></textarea>
+                    <small class="erro-campo" data-testid="erro-filme-sinopse"></small>
+                </label>
+                <div class="acoes-form campo-inteiro">
+                    <button type="submit" class="btn-primario" data-testid="btn-salvar-filme">Salvar filme</button>
+                    <button type="button" id="btn-cancelar-edicao" class="btn-secundario oculto" data-testid="btn-cancelar-edicao">Cancelar edição</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="cartao">
+            <div class="filtros">
+                <input type="search" id="busca-filme" placeholder="Buscar pelo título..." aria-label="Buscar pelo título" data-testid="busca-filme">
+                <select id="filtro-genero" aria-label="Filtrar por gênero" data-testid="filtro-genero"></select>
+                <span id="total-filmes" class="texto-suave" data-testid="total-filmes"></span>
+            </div>
+            <p id="catalogo-vazio" class="vazio oculto" data-testid="catalogo-vazio">Nenhum filme encontrado.</p>
+            <table class="tabela-filmes" data-testid="tabela-filmes">
+                <thead>
+                    <tr><th>Título</th><th>Ano</th><th>Gênero</th><th>Duração</th><th>Sessões</th><th></th></tr>
+                </thead>
+                <tbody id="lista-filmes" data-testid="lista-filmes"></tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer class="rodape">Agenda de Filmes · Rust + Axum + SQLite</footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

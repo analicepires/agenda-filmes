@@ -1,0 +1,7 @@
+/target
+/data
+*.db
+*.db-*
+__pycache__/
+.pytest_cache/
+/qa/reports
